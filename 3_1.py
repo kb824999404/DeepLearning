@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.colors import LogNorm
 
-file_name="ch03.npz"
+file_name="Data/ch03.npz"
 
 def TargetFunction(x,w,b):
     y=w*x+b
