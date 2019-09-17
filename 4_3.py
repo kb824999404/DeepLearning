@@ -5,7 +5,7 @@ from HelperClass.DataReader_1_0 import *
 
 file_name="Data/ch04.npz"
 
-class NeuralNet(object):
+class NeuralNet_0_1(object):
     def __init__(self,eta):
         self.eta=eta
         self.w=0
@@ -51,7 +51,7 @@ if __name__=='__main__':
     sdr=DataReader_1_0(file_name)
     sdr.ReadData()
     eta=0.1
-    net=NeuralNet(eta)
+    net=NeuralNet_0_1(eta)
     net.train(sdr)
     print("w=%f,b=%f"%(net.w,net.b))
     result=net.inference(1.346)
