@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.colors import LogNorm
 
-file_name="../../data/3_1.npz"
+file_name="ch03.npz"
 
 def TargetFunction(x,w,b):
     y=w*x+b
@@ -91,4 +91,120 @@ def show_cost_for_4b(x,y,n,w,b):
     plt.show()
 
 def show_all_4b(x,y,n,w,b):
+    plt.scatter(x,y)
+    z1=w*x+b-1
+    loss1=CostFunction(x,y,z1,n)
+    plt.plot(x,z1)
+
+    z2=w*x+b-0.5
+    loss2=CostFunction(x,y,z2,n)
+    plt.plot(x,z2)
+
+    z3=w*x+b
+    loss3=CostFunction(x,y,z3,n)
+    plt.plot(x,z3)
+
+    z4=w*x+b+0.5
+    loss4=CostFunction(x,y,z4,n)
+    plt.plot(x,z4)
+
+def show_3d_surface(x,y,m,w,b):
+    fig=plt.figure()
+    ax=Axes3D(fig)
+    X=x.reshape(m,1)
+    Y=y.reshape(m,1)
+    len1=50
+    len2=50
+    len=len1*len2
+    W=np.linspace(w-2,w+2,len1)
+    B=np.linspace(b-2,b+2,len2)
+    W,B=np.meshgrid(W,B)
+
+    m=X.shape[0]
+    Z=np.dot(X,W.ravel().reshape(1,len))+B.ravel().reshape(1,len)
+    Loss1=(Z-Y)**2
+    Loss2=Loss1.sum(axis=0,keepdims=True)/m/2
+    Loss3=Loss2.reshape(len1,len2)
+    ax.plot_surface(W,B,Loss3,norm=LogNorm(),cmap='rainbow')
+    plt.show()
+
+def test_2d(x,y,m,w,b):
+    s = 200
+    W = np.linspace(w-2,w+2,s)
+    B = np.linspace(b-2,b+2,s)
+    LOSS = np.zeros((s,s))
+    for i in range(len(W)):
+        for j in range(len(B)):
+            z = W[i] * x + B[j]
+            loss = CostFunction(x,y,z,m)
+            LOSS[i,j] = round(loss, 2)
+    print(LOSS)
+    print("please wait for 20 seconds...")
+    while(True):
+        X = []
+        Y = []
+        is_first = True
+        loss = 0
+        for i in range(len(W)):
+            for j in range(len(B)):
+                if LOSS[i,j] != 0:
+                    if is_first:
+                        loss = LOSS[i,j]
+                        X.append(W[i])
+                        Y.append(B[j])
+                        LOSS[i,j] = 0
+                        is_first = False
+                    elif (LOSS[i,j] == loss) or (abs(loss / LOSS[i,j] -  1) < 0.02):
+                        X.append(W[i])
+                        Y.append(B[j])
+                        LOSS[i,j] = 0
+        if is_first == True:
+            break
+        plt.plot(X,Y,'.')
     
+    plt.xlabel("w")
+    plt.ylabel("b")
+    plt.show()
+
+def draw_contour(x,y,m,w,b):
+    X = x.reshape(m,1)
+    Y = y.reshape(m,1)
+    len1 = 50
+    len2 = 50
+    len = len1 * len2
+    W = np.linspace(w-2, w+2, len1)
+    B = np.linspace(b-2, b+2, len2)
+    W, B = np.meshgrid(W, B)
+    LOSS = np.zeros((len1, len2))
+
+    m = X.shape[0]
+    Z = np.dot(X, W.ravel().reshape(1,len)) + B.ravel().reshape(1,len)
+    Loss1 = (Z - Y)**2
+    Loss2 = Loss1.sum(axis=0,keepdims=True)/m/2
+    Loss3 = Loss2.reshape(len1, len2)
+    plt.contour(W,B,Loss3,levels=np.logspace(-5, 5, 50), norm=LogNorm(), cmap=plt.cm.jet)
+    plt.show()
+
+if __name__ == '__main__':
+    
+    m=50
+    w=2
+    b=3
+    x,y=CreateSampleData(w,b,m)
+    plt.scatter(x,y)
+    #plt.axis([0,1.1,0,4.2])
+    plt.show()
+    
+    show_cost_for_4b(x,y,m,w,b)
+    show_all_4b(x,y,m,w,b)
+
+    CalculateCostB(x,y,m,w,b)
+    CalculateCostW(x,y,m,w,b)
+    
+    #CalculateCostWB(x,y,n)
+
+    show_3d_surface(x,y,m,w,b)
+    
+    draw_contour(x,y,m,w,b)
+
+    test_2d(x,y,m,w,b)
